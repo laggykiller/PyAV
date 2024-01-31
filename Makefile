@@ -25,9 +25,10 @@ fate-suite:
 	rsync -vrltLW rsync://fate-suite.ffmpeg.org/fate-suite/ tests/assets/fate-suite/
 
 lint:
-	black -v --check av examples tests
+	black av examples tests
 	flake8 av examples tests
 	isort --check-only --diff av examples tests
+	git diff
 
 test:
 	$(PYTHON) setup.py test
