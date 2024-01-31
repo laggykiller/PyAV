@@ -38,6 +38,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
+          - {os: ubuntu-latest, python: 3.8, ffmpeg: "6.1", extras: true}
           - {os: ubuntu-latest, python: 3.8, ffmpeg: "6.0", extras: true}
           - {os: ubuntu-latest, python: 3.8, ffmpeg: "5.1"}
           - {os: ubuntu-latest, python: 3.8, ffmpeg: "5.0"}
@@ -119,6 +120,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
+          - {os: windows-latest, python: 3.8, ffmpeg: "6.1"}
           - {os: windows-latest, python: 3.8, ffmpeg: "6.0"}
           - {os: windows-latest, python: 3.8, ffmpeg: "5.1"}
           - {os: windows-latest, python: 3.8, ffmpeg: "5.0"}
@@ -165,7 +167,7 @@ jobs:
       - name: Build source package
         run: |
           pip install cython
-          python scripts/fetch-vendor.py --config-file scripts/ffmpeg-6.0.json /tmp/vendor
+          python scripts/fetch-vendor.py --config-file scripts/ffmpeg-6.1.json /tmp/vendor
           PKG_CONFIG_PATH=/tmp/vendor/lib/pkgconfig python setup.py sdist
       - name: Upload source package
         uses: actions/upload-artifact@v3
@@ -181,21 +183,33 @@ jobs:
         include:
           - os: macos-latest
             arch: arm64
+            python_version: 3.8
           - os: macos-latest
             arch: x86_64
+            python_version: 3.8
           - os: ubuntu-latest
             arch: aarch64
+            python_version: 3.8
           - os: ubuntu-latest
             arch: i686
+            python_version: 3.8
           - os: ubuntu-latest
             arch: x86_64
+            python_version: 3.8
           - os: windows-latest
             arch: AMD64
+            python_version: 3.8
+          - os: windows-latest
+            arch: x86
+            python_version: 3.8
+          - os: windows-latest
+            arch: ARM64
+            python_version: 3.9
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          python-version: ${{ matrix.python_version }}
       - name: Set up QEMU
         if: matrix.os == 'ubuntu-latest'
         uses: docker/setup-qemu-action@v3
@@ -208,8 +222,8 @@ jobs:
         env:
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_BEFORE_ALL_LINUX: yum install -y alsa-lib libxcb
-          CIBW_BEFORE_BUILD: python scripts/fetch-vendor.py --config-file scripts/ffmpeg-6.0.json /tmp/vendor
-          CIBW_BEFORE_BUILD_WINDOWS: python scripts\fetch-vendor.py --config-file scripts\ffmpeg-6.0.json C:\cibw\vendor
+          CIBW_BEFORE_BUILD: python scripts/fetch-vendor.py --config-file scripts/ffmpeg-6.1.json /tmp/vendor
+          CIBW_BEFORE_BUILD_WINDOWS: python scripts\fetch-vendor.py --config-file scripts\ffmpeg-6.1.json C:\cibw\vendor
           CIBW_ENVIRONMENT_LINUX: LD_LIBRARY_PATH=/tmp/vendor/lib:$LD_LIBRARY_PATH PKG_CONFIG_PATH=/tmp/vendor/lib/pkgconfig
           CIBW_ENVIRONMENT_MACOS: PKG_CONFIG_PATH=/tmp/vendor/lib/pkgconfig LDFLAGS=-headerpad_max_install_names
           CIBW_ENVIRONMENT_WINDOWS: INCLUDE=C:\\cibw\\vendor\\include LIB=C:\\cibw\\vendor\\lib PYAV_SKIP_TESTS=unicode_filename
@@ -229,18 +243,18 @@ jobs:
           name: dist
           path: dist/
 
-  publish:
-    runs-on: ubuntu-latest
-    needs: [package-source, package-wheel]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
-        with:
-          name: dist
-          path: dist/
-      - name: Publish to PyPI
-        if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_TOKEN }}
+  # publish:
+  #   runs-on: ubuntu-latest
+  #   needs: [package-source, package-wheel]
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: dist
+  #         path: dist/
+  #     - name: Publish to PyPI
+  #       if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags/')
+  #       uses: pypa/gh-action-pypi-publish@release/v1
+  #       with:
+  #         user: __token__
+  #         password: ${{ secrets.PYPI_TOKEN }}

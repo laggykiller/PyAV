@@ -3,8 +3,6 @@ import logging
 import json
 import os
 import platform
-import shutil
-import struct
 import subprocess
 
 
@@ -20,10 +18,18 @@ def get_platform():
             machine = os.environ["ARCHFLAGS"].split()[1]
         return f"macosx_{machine}"
     elif system == "Windows":
-        if struct.calcsize("P") * 8 == 64:
+        if os.getenv("CIBW_ARCHS") == "AMD64":
             return "win_amd64"
-        else:
+        elif os.getenv("CIBW_ARCHS") == "x86":
             return "win32"
+        elif os.getenv("CIBW_ARCHS") == "ARM64":
+            return "win_arm64"
+        elif machine.lower() in ("amd64", "x86_64", "x64"):
+            return "win_amd64"
+        elif machine.lower() in ("i386", "i686", "x86"):
+            return "win32"
+        else:
+            return "win_arm64"
     else:
         raise Exception(f"Unsupported system {system}")
 

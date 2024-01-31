@@ -1,6 +1,14 @@
 PyAV
 ====
 
+This is an unofficial repo for providing Windows arm64 PyAV wheels with prepacked ffmpeg.
+
+Please go to [release page](https://github.com/laggykiller/PyAV/releases) for downloading wheels.
+
+If you encounter problem with Windows arm64 wheels, please report issue here.
+
+Official PyAV repo is in https://github.com/PyAV-Org/PyAV
+
 [![GitHub Test Status][github-tests-badge]][github-tests] \
 [![Gitter Chat][gitter-badge]][gitter] [![Documentation][docs-badge]][docs] \
 [![Python Package Index][pypi-badge]][pypi] [![Conda Forge][conda-badge]][conda]
