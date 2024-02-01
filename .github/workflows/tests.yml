@@ -13,6 +13,19 @@ on:
       - '**.rst'
       - '**.txt'
 jobs:
+  createrelease:
+    name: Create Release
+    runs-on: [ubuntu-latest]
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      with:
+        token: "${{ secrets.GITHUB_TOKEN }}"
+        name: ${{ github.ref_name }}
+
   style:
     runs-on: ubuntu-latest
 
@@ -174,6 +187,13 @@ jobs:
         with:
           name: dist
           path: dist/
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: dist/*
 
   package-wheel:
     runs-on: ${{ matrix.os }}
@@ -189,6 +209,9 @@ jobs:
             python_version: 3.8
           - os: ubuntu-latest
             arch: aarch64
+            python_version: 3.8
+          - os: ubuntu-latest
+            arch: ppc64le
             python_version: 3.8
           - os: ubuntu-latest
             arch: i686
@@ -242,6 +265,13 @@ jobs:
         with:
           name: dist
           path: dist/
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: dist/*
 
   # publish:
   #   runs-on: ubuntu-latest
