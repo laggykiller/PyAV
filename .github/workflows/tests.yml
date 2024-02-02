@@ -213,9 +213,9 @@ jobs:
           - os: ubuntu-latest
             arch: aarch64
             python_version: 3.8
-          - os: ubuntu-latest
-            arch: ppc64le
-            python_version: 3.8
+          # - os: ubuntu-latest
+          #   arch: ppc64le
+          #   python_version: 3.8
           - os: ubuntu-latest
             arch: i686
             python_version: 3.8
